@@ -131,7 +131,7 @@ A Flask-based API for interacting with Ollama models, with customizable settings
 
 ## 🔹 Configuring ChatAPI
 
-8. Configuring ChatAPI
+--Configuring ChatAPI
 Open the ChatAPI app.
 Change API Provider to Custom LLM.
 Enter the Hostname/IP in the field:
