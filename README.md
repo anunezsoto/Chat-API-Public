@@ -127,3 +127,44 @@ A Flask-based API for interacting with Ollama models, with customizable settings
 - For troubleshooting:
   - Linux: Check `sudo journalctl -u ollama` or `flask.log`.
   - Windows: Check `flask.log`.
+
+
+## 🔹 Configuring ChatAPI
+
+8. Configuring ChatAPI
+Open the ChatAPI app.
+Change API Provider to Custom LLM.
+Enter the Hostname/IP in the field:
+If using a public IP (not recommended without HTTPS):
+Example:
+```bash
+192.168.1.20
+```
+If using a domain name (recommended with HTTPS):
+```bash
+your-domain.com
+```
+Set a Custom Port (if different from default 6000):
+Note: Port 6000 can be changed in the llmapi.py
+Example:
+```bash
+Port: 6000
+```
+Save the settings and test the connection.
+
+
+
+# Optional Config
+## 🔹 Configure SSL (NGINX RECOMMENDED)
+Now that your API is accessible from outside your network, you can configure ChatAPI to use it securely.
+- NGINX config example is availabe in main above. 
+
+
+
+
+
+🎉 Conclusion
+
+You have now successfully set up and deployed a Flask API with Ollama on Linux, allowing external access through port forwarding. 🚀
+
+For troubleshooting, check the logs:
