@@ -44,7 +44,7 @@ A Flask-based API for interacting with Ollama models, with customizable settings
    sudo su -
    vim /etc/systemd/system/flask_llm.service
    ```
-   Paste and update paths:
+   Paste and update paths (UPDATE WITH YOUR HOME /home/yourusername/Chat-API-Public):
    ```ini
    [Unit]
    Description=Flask API for Ollama
