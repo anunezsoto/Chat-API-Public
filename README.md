@@ -1,61 +1,129 @@
-Install 
-  cd ~/
-  git clone https://github.com/anunezsoto/Chat-API-Public.git
-  cd Chat-API-Public
-  python3 -m venv venv
-  source venv/bin/activate
-  pip install -r requirements.txt
+# Chat-API-Public 🚀
 
+A Flask-based API for interacting with Ollama models, with customizable settings via an auto-generated `config.json`.
 
+## 📋 Prerequisites
 
-now edit ollama service and add the env variables:
-vim /etc/systemd/system/ollama.service
+- **Python 3.8+** and `pip` (Python package manager).
+- **Ollama**: Ensure Ollama is installed and a model is downloaded.
+  - 🐧 **Linux**: [Ollama Linux Setup](https://ollama.com/download/linux)
+  - 🪟 **Windows**: [Ollama Windows Setup](https://ollama.com/download/windows)
 
-Add & Save:
-Environment="OLLAMA_ORIGINS=*"
-Environment="OLLAMA_HOST=0.0.0.0:11434"
+## 🐧 Linux Setup
 
-Now restart systemctl restart ollama.service
+1. **Clone and Set Up Environment**  
+   Clone the repository and install dependencies:
+   ```bash
+   cd ~/
+   git clone https://github.com/anunezsoto/Chat-API-Public.git
+   cd Chat-API-Public
+   python3 -m venv venv
+   source venv/bin/activate
+   pip install -r requirements.txt
+   ```
 
+2. **Configure Ollama Service**  
+   Modify the Ollama service to allow external access:
+   ```bash
+   sudo vim /etc/systemd/system/ollama.service
+   ```
+   Add or update the `[Service]` section:
+   ```ini
+   [Service]
+   Environment="OLLAMA_ORIGINS=*"
+   Environment="OLLAMA_HOST=0.0.0.0:11434"
+   ```
+   Save and restart:
+   ```bash
+   sudo systemctl restart ollama.service
+   ```
 
+3. **Set Up Flask Service**  
+   Create a systemd service for the Flask API (replace `yourusername` with your Linux username):
+   ```bash
+   sudo su -
+   vim /etc/systemd/system/flask_llm.service
+   ```
+   Paste and update paths:
+   ```ini
+   [Unit]
+   Description=Flask API for Ollama
+   After=network.target
 
-Create the flask service (update the /home/yourusername/llmapi fields with your actual home dir)
-sudo su -
-vim /etc/systemd/system/flask_llm.service
-Paste the following contents into the file (modify paths as needed):
+   [Service]
+   User=yourusername
+   WorkingDirectory=/home/yourusername/Chat-API-Public
+   ExecStart=/home/yourusername/Chat-API-Public/venv/bin/gunicorn -w 1 -b 0.0.0.0:6000 llmapi:app
+   Restart=always
 
-[Unit]
-Description=Flask API for Ollama
-After=network.target
+   [Install]
+   WantedBy=multi-user.target
+   ```
+   Enable and start:
+   ```bash
+   sudo systemctl enable flask_llm.service
+   sudo systemctl start flask_llm.service
+   ```
+   Verify:
+   ```bash
+   sudo systemctl status flask_llm.service
+   ```
 
-[Service]
-User=yourusername
-WorkingDirectory=/home/yourusername/llmapi
-ExecStart=/home/yourusername/llmapi/venv/bin/gunicorn -w 1 -b 0.0.0.0:6000 llmapi:app
-Restart=always
+## 🪟 Windows Setup
 
-[Install]
-WantedBy=multi-user.target
+1. **Clone or Download**  
+   - Clone with Git:
+     ```bash
+     git clone https://github.com/anunezsoto/Chat-API-Public.git
+     cd Chat-API-Public
+     ```
+   - Or download the ZIP from GitHub, unzip, and navigate to the folder.
 
+2. **Set Up Environment**  
+   Create and activate a virtual environment:
+   ```bash
+   python -m venv venv
+   venv\Scripts\activate
+   pip install -r requirements.txt
+   ```
 
+3. **Run the API**  
+   Start the API:
+   ```bash
+   python llmapi.py
+   ```
+   To run in the background:
+   ```bash
+   start /b python llmapi.py
+   ```
 
-Now enable and start
-systemctl enable flask_llm.service
-systemctl start flask_llm.service
-To check if the service is running:
+4. **Allow Firewall Access**  
+   Allow the API through Windows Defender Firewall (run as Administrator):
+   ```bash
+   netsh advfirewall firewall add rule name="Flask API" dir=in action=allow protocol=TCP localport=6000
+   ```
 
-systemctl status flask_llm.service
+## ⚙️ Configuration
 
-Now add the flask pip env install for windows and instructions on how to run it on windows..
-include ways to start 
-To start the API, run:
+- A `config.json` file is auto-generated on first run with defaults:
+  ```json
+  {
+    "log_path": "flask.log",
+    "ollama_server": "http://localhost:11434",
+    "use_context": true,
+    "flask_host": "0.0.0.0",
+    "flask_port": 6000,
+    "flask_debug": false,
+    "db_path": "user_contexts.db"
+  }
+  ```
+- Edit `config.json` to customize settings like the Ollama server URL or port.
 
-python llmapi.py
-If you want to run it in the background, use:
+## 📝 Notes
 
-start /b python llmapi.py
-Allow Firewall Access (Recommended)
-If you're running the API on Windows, you'll need to allow it through the Windows Defender Firewall:
-
-# Allow Flask API port (default: 6000)
-netsh advfirewall firewall add rule name="Flask API" dir=in action=allow protocol=TCP localport=6000
+- The API runs at `http://0.0.0.0:6000` by default.
+- Logs are saved to `flask.log`, and the database to `user_contexts.db` in the project directory.
+- Ensure the Ollama server is running (default: `http://localhost:11434`).
+- For troubleshooting:
+  - Linux: Check `sudo journalctl -u ollama` or `flask.log`.
+  - Windows: Check `flask.log`.
